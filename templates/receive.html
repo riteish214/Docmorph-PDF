@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Receive File - DocMorph{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header text-white" style="background-color: #28a745;">
+                <h4 class="mb-0"><i class="fas fa-download"></i> Receive File</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-secondary">Enter the access code provided by the sender to download the file. Files are automatically deleted after download.</p>
+                
+                <form id="receiveForm">
+                    <div class="mb-3">
+                        <label for="accessCode" class="form-label">Access Code</label>
+                        <input type="text" 
+                               id="accessCode" 
+                               name="code" 
+                               class="form-control form-control-lg text-center fw-bold" 
+                               placeholder="Enter 5-8 character code"
+                               maxlength="8"
+                               autocomplete="off"
+                               required
+                               style="font-size: 1.5rem; letter-spacing: 0.5rem; text-transform: uppercase;">
+                        <small class="text-muted">Code is case-insensitive</small>
+                    </div>
+
+                    <div id="result" class="alert d-none"></div>
+
+                    <button type="submit" class="btn w-100 btn-success" id="submitBtn">
+                        <i class="fas fa-download"></i> Download File
+                    </button>
+                </form>
+
+                <div class="mt-4">
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Note:</strong> Files expire after 15 minutes or immediately after download. Each code can only be used once.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const codeInput = document.getElementById('accessCode');
+    
+    // Auto-uppercase and strip spaces
+    codeInput.addEventListener('input', function(e) {
+        this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    });
+    
+    // Paste handler
+    codeInput.addEventListener('paste', function(e) {
+        setTimeout(() => {
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        }, 10);
+    });
+    
+    document.getElementById('receiveForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const code = document.getElementById('accessCode').value.trim().toUpperCase();
+        if (!code) {
+            showResult('Please enter an access code', 'danger');
+            return;
+        }
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const formData = new FormData(this);
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        try {
+            const response = await fetch('/api/receive', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (response.ok) {
+                // Get filename from Content-Disposition header if available
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = 'download';
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                    if (filenameMatch) {
+                        filename = filenameMatch[1];
+                    }
+                }
+                
+                // Download the file
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                showResult('File downloaded successfully!', 'success');
+                
+                // Clear form after successful download
+                setTimeout(() => {
+                    document.getElementById('receiveForm').reset();
+                }, 2000);
+            } else {
+                const data = await response.json();
+                showResult(data.error || 'Invalid or expired access code', 'danger');
+            }
+        } catch (error) {
+            showResult('An error occurred: ' + error.message, 'danger');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-download"></i> Download File';
+        }
+    });
+});
+
+function showResult(message, type) {
+    const result = document.getElementById('result');
+    if (result) {
+        result.className = `alert alert-${type}`;
+        result.innerHTML = message;
+        result.classList.remove('d-none');
+        
+        setTimeout(() => {
+            result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+}
+</script>
+{% endblock %}
+

@@ -1,0 +1,64 @@
+DocMorph – The All-in-One PDF Toolkit
+
+DocMorph is a comprehensive web-based PDF manipulation toolkit built with Flask, designed for seamless document processing through a sleek black-themed, responsive interface. It provides all essential PDF operations along with secure file and text sharing — optimized for simplicity, privacy, and performance.
+
+Core PDF Operations
+
+Merge PDFs: Combine multiple PDF files into one organized document.
+
+Split PDFs: Extract or rearrange specific pages easily.
+
+Convert Files: Convert between PDF, Word (DOC/DOCX), and PowerPoint (PPT/PPTX) formats.
+
+Compress PDFs: Reduce file size efficiently while preserving quality.
+
+Rotate Pages: Adjust page orientation for proper alignment.
+
+Secure PDFs: Add password protection to sensitive files.
+
+Share Files & Text: Upload and share files up to 1 GB or plain text securely via temporary links.
+
+Key Features
+
+DocMorph focuses on a clean, dark-themed user interface that enhances usability and reduces eye strain. The design supports drag-and-drop uploads, real-time progress indicators, and file previews for an intuitive workflow.
+It ensures secure temporary storage with automatic cleanup, protecting user data and privacy. The application is fully responsive, performing smoothly across desktops, tablets, and mobile devices.
+
+Key UI highlights include:
+
+Professional dark mode with custom Bootstrap styling
+
+Instant validation and upload feedback
+
+Smooth performance using lightweight, optimized scripts
+
+Secure sharing for both files and text snippets
+
+Technology Stack
+
+Backend
+
+Python 3.11 – Core language
+
+Flask – Lightweight, modular web framework
+
+Gunicorn – WSGI server for production deployment
+
+PDF Processing Libraries
+
+PyPDF2: Core engine for merge, split, rotate, and encrypt operations
+
+pdf2docx: Reliable conversion between PDF and Word
+
+python-pptx: PowerPoint file manipulation and creation
+
+ReportLab: PDF generation and rendering
+
+Frontend
+
+HTML5 / CSS3: Modern, responsive design foundation
+
+Bootstrap 5: Flexible UI framework with custom dark styling
+
+JavaScript (Vanilla): Handles interactivity and live previews
+
+Font Awesome: Icon set for a clean, modern appearance

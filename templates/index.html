@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="display-4 fw-bold mb-3">
+        <i class="fas fa-file-pdf text-danger"></i> DocMorph
+    </h1>
+    <p class="lead text-secondary">The All-in-One PDF Toolkit</p>
+    <p class="text-muted">Secure, Fast, and Privacy-Focused Document Processing</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-object-group fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Merge PDFs</h5>
+                <p class="card-text text-secondary">Combine multiple PDF files into one organized document</p>
+                <a href="{{ url_for('merge_pdfs') }}" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-cut fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Split PDFs</h5>
+                <p class="card-text text-secondary">Extract or rearrange specific pages easily</p>
+                <a href="{{ url_for('split_pdf') }}" class="btn btn-success">Get Started</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-exchange-alt fa-3x text-info mb-3"></i>
+                <h5 class="card-title">Convert Files</h5>
+                <p class="card-text text-secondary">Convert between PDF, Word (DOCX), and Text (TXT) formats</p>
+                <a href="{{ url_for('convert_file') }}" class="btn btn-info">Get Started</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-compress fa-3x text-warning mb-3"></i>
+                <h5 class="card-title">Compress PDFs</h5>
+                <p class="card-text text-secondary">Reduce file size while preserving quality</p>
+                <a href="{{ url_for('compress_pdf') }}" class="btn btn-warning">Get Started</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-sync-alt fa-3x text-secondary mb-3"></i>
+                <h5 class="card-title">Rotate Pages</h5>
+                <p class="card-text text-secondary">Adjust page orientation for proper alignment</p>
+                <a href="{{ url_for('rotate_pdf') }}" class="btn btn-secondary">Get Started</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-lock fa-3x text-danger mb-3"></i>
+                <h5 class="card-title">Secure PDFs</h5>
+                <p class="card-text text-secondary">Add password protection to sensitive files</p>
+                <a href="{{ url_for('secure_pdf') }}" class="btn btn-danger">Get Started</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4">
+        <div class="card feature-card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-share-alt fa-3x text-purple mb-3"></i>
+                <h5 class="card-title">Share Files & Text</h5>
+                <p class="card-text text-secondary">Upload and share files or text securely via temporary links or access codes</p>
+                <a href="{{ url_for('share') }}" class="btn btn-purple">Get Started</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-lg-8 mx-auto">
+        <div class="card bg-dark border-secondary">
+            <div class="card-body text-center">
+                <h4 class="mb-3">Key Features</h4>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <i class="fas fa-moon text-primary me-2"></i>
+                        <span>Professional Dark Mode</span>
+                    </div>
+                    <div class="col-md-6">
+                        <i class="fas fa-shield-alt text-success me-2"></i>
+                        <span>Secure Temporary Storage</span>
+                    </div>
+                    <div class="col-md-6">
+                        <i class="fas fa-mobile-alt text-info me-2"></i>
+                        <span>Fully Responsive Design</span>
+                    </div>
+                    <div class="col-md-6">
+                        <i class="fas fa-tachometer-alt text-warning me-2"></i>
+                        <span>Fast Performance</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,474 @@
+{% extends "base.html" %}
+
+{% block title %}Share Files & Text - DocMorph{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header text-white" style="background-color: #9333ea;">
+                <h4 class="mb-0"><i class="fas fa-share-alt"></i> Share Files & Text</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-secondary">Share files (up to 1GB) or text securely. Each share generates both a temporary link (24 hours) and an access code (15 minutes) for flexible sharing options.</p>
+                
+                <ul class="nav nav-tabs mb-3" id="shareTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="file-tab" data-bs-toggle="tab" data-bs-target="#file" type="button">
+                            <i class="fas fa-file"></i> Share File
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="text-tab" data-bs-toggle="tab" data-bs-target="#text" type="button">
+                            <i class="fas fa-font"></i> Share Text
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="receive-tab" data-bs-toggle="tab" data-bs-target="#receive" type="button">
+                            <i class="fas fa-download"></i> Receive File
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="receive-text-tab" data-bs-toggle="tab" data-bs-target="#receive-text" type="button">
+                            <i class="fas fa-align-left"></i> Receive Text
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="shareTabContent">
+                    <div class="tab-pane fade show active" id="file" role="tabpanel">
+                        <form id="shareFileForm" enctype="multipart/form-data">
+                            <input type="hidden" name="share_type" value="file">
+                            <div class="mb-3">
+                                <label class="form-label">Upload File (Max 1GB)</label>
+                                <div class="drop-zone" id="dropZone">
+                                    <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                                    <p>Drag & drop file here or click to browse</p>
+                                    <input type="file" id="fileInput" name="file" class="d-none">
+                                </div>
+                            </div>
+
+                            <div class="progress mb-3 d-none" id="progressBar">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"></div>
+                            </div>
+
+                            <div id="fileResult" class="alert d-none"></div>
+
+                            <button type="submit" class="btn w-100" style="background-color: #9333ea; color: white;" id="fileSubmitBtn">
+                                <i class="fas fa-share-alt"></i> Generate Share Link & Access Code
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane fade" id="text" role="tabpanel">
+                        <form id="shareTextForm">
+                            <input type="hidden" name="share_type" value="text">
+                            <div class="mb-3">
+                                <label for="textContent" class="form-label">Text Content</label>
+                                <textarea class="form-control" id="textContent" name="text_content" rows="6" placeholder="Enter text to share..."></textarea>
+                            </div>
+
+                            <div id="textResult" class="alert d-none"></div>
+
+                            <button type="submit" class="btn w-100" style="background-color: #9333ea; color: white;" id="textSubmitBtn">
+                                <i class="fas fa-share-alt"></i> Generate Share Link & Access Code
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane fade" id="receive" role="tabpanel">
+                        <form id="receiveForm">
+                            <div class="mb-3">
+                                <label for="accessCode" class="form-label">Access Code</label>
+                                <input type="text" 
+                                       id="accessCode" 
+                                       name="code" 
+                                       class="form-control form-control-lg text-center fw-bold" 
+                                       placeholder="Enter 5-8 character code"
+                                       maxlength="8"
+                                       autocomplete="off"
+                                       required
+                                       style="font-size: 1.5rem; letter-spacing: 0.5rem; text-transform: uppercase;">
+                                <small class="text-muted">Code is case-insensitive</small>
+                            </div>
+
+                            <div id="receiveResult" class="alert d-none"></div>
+
+                            <button type="submit" class="btn w-100 btn-success" id="receiveSubmitBtn">
+                                <i class="fas fa-download"></i> Retrieve File / Text
+                            </button>
+                        </form>
+
+                        <div class="mt-4">
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle"></i> 
+                                <strong>Note:</strong> Files expire after 15 minutes or immediately after download. Each code can only be used once.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="receive-text" role="tabpanel">
+                        <form id="receiveTextForm">
+                            <div class="mb-3">
+                                <label for="textAccessCode" class="form-label">Access Code</label>
+                                <input type="text" 
+                                       id="textAccessCode" 
+                                       name="code" 
+                                       class="form-control form-control-lg text-center fw-bold" 
+                                       placeholder="Enter 5-8 character code"
+                                       maxlength="8"
+                                       autocomplete="off"
+                                       required
+                                       style="font-size: 1.5rem; letter-spacing: 0.5rem; text-transform: uppercase;">
+                                <small class="text-muted">Code is case-insensitive</small>
+                            </div>
+
+                            <div id="receiveTextResult" class="alert d-none"></div>
+
+                            <button type="submit" class="btn w-100 btn-success" id="receiveTextSubmitBtn">
+                                <i class="fas fa-align-left"></i> Retrieve Text
+                            </button>
+                        </form>
+
+                        <div class="mt-4">
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle"></i> 
+                                <strong>Note:</strong> Text content expires after 15 minutes or immediately after retrieval. Each code can only be used once.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('shareFileForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const fileInput = document.getElementById('fileInput');
+    
+    if (!fileInput.files.length) {
+        document.getElementById('fileResult').className = 'alert alert-danger';
+        document.getElementById('fileResult').innerHTML = 'Please select a file';
+        document.getElementById('fileResult').classList.remove('d-none');
+        return;
+    }
+    
+    document.getElementById('progressBar').classList.remove('d-none');
+    document.getElementById('fileSubmitBtn').disabled = true;
+    
+    try {
+        const response = await fetch('/share', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('fileResult').className = 'alert alert-success';
+            let resultHTML = '<strong><i class="fas fa-check-circle"></i> File uploaded successfully!</strong><br><br>';
+            
+            // Share Link (24 hours)
+            resultHTML += '<div class="mb-3"><label class="form-label small">Share Link (Expires: ' + data.expiry + ')</label>';
+            resultHTML += '<input type="text" class="form-control" value="' + data.share_link + '" readonly onclick="this.select(); document.execCommand(\'copy\');"><small class="text-muted">Click to copy</small></div>';
+            
+            // Access Code (15 minutes)
+            resultHTML += '<div class="mb-2"><label class="form-label small">Access Code (Expires in 15 minutes or after download)</label>';
+            resultHTML += '<input type="text" id="accessCodeDisplay" class="form-control form-control-lg text-center fw-bold" value="' + data.code + '" readonly onclick="this.select(); document.execCommand(\'copy\'); showCopyFeedback();" style="font-size: 1.5rem; letter-spacing: 0.5rem;"><small class="text-muted">Click to copy. Use this code in the "Receive File" tab.</small></div>';
+            
+            document.getElementById('fileResult').innerHTML = resultHTML;
+        } else {
+            document.getElementById('fileResult').className = 'alert alert-danger';
+            document.getElementById('fileResult').innerHTML = data.error || 'An error occurred';
+        }
+        document.getElementById('fileResult').classList.remove('d-none');
+    } catch (error) {
+        document.getElementById('fileResult').className = 'alert alert-danger';
+        document.getElementById('fileResult').innerHTML = 'An error occurred: ' + error.message;
+        document.getElementById('fileResult').classList.remove('d-none');
+    } finally {
+        document.getElementById('progressBar').classList.add('d-none');
+        document.getElementById('fileSubmitBtn').disabled = false;
+    }
+});
+
+document.getElementById('shareTextForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const textContent = document.getElementById('textContent').value;
+    
+    if (!textContent.trim()) {
+        document.getElementById('textResult').className = 'alert alert-danger';
+        document.getElementById('textResult').innerHTML = 'Please enter some text';
+        document.getElementById('textResult').classList.remove('d-none');
+        return;
+    }
+    
+    document.getElementById('textSubmitBtn').disabled = true;
+    
+    try {
+        const response = await fetch('/share', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            document.getElementById('textResult').className = 'alert alert-success';
+            let resultHTML = '<strong><i class="fas fa-check-circle"></i> Text shared successfully!</strong><br><br>';
+            
+            // Share Link (24 hours)
+            resultHTML += '<div class="mb-3"><label class="form-label small">Share Link (Expires: ' + data.expiry + ')</label>';
+            resultHTML += '<input type="text" class="form-control" value="' + data.share_link + '" readonly onclick="this.select(); document.execCommand(\'copy\');"><small class="text-muted">Click to copy</small></div>';
+            
+            // Access Code (15 minutes)
+            resultHTML += '<div class="mb-2"><label class="form-label small">Access Code (Expires in 15 minutes or after retrieval)</label>';
+            resultHTML += '<input type="text" id="textAccessCodeDisplay" class="form-control form-control-lg text-center fw-bold" value="' + data.code + '" readonly onclick="this.select(); document.execCommand(\'copy\'); showTextCopyFeedback();" style="font-size: 1.5rem; letter-spacing: 0.5rem;"><small class="text-muted">Click to copy. Use this code in the "Receive Text" tab.</small></div>';
+            
+            document.getElementById('textResult').innerHTML = resultHTML;
+        } else {
+            document.getElementById('textResult').className = 'alert alert-danger';
+            document.getElementById('textResult').innerHTML = data.error || 'An error occurred';
+        }
+        document.getElementById('textResult').classList.remove('d-none');
+    } catch (error) {
+        document.getElementById('textResult').className = 'alert alert-danger';
+        document.getElementById('textResult').innerHTML = 'An error occurred: ' + error.message;
+        document.getElementById('textResult').classList.remove('d-none');
+    } finally {
+        document.getElementById('textSubmitBtn').disabled = false;
+    }
+});
+
+// Receive form handler
+document.getElementById('receiveForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const code = document.getElementById('accessCode').value.trim().toUpperCase();
+    if (!code) {
+        showReceiveResult('Please enter an access code', 'danger');
+        return;
+    }
+    
+    const submitBtn = document.getElementById('receiveSubmitBtn');
+    const formData = new FormData(this);
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    
+    try {
+        const response = await fetch('/api/receive', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+            // Handle JSON response (text content)
+            const data = await response.json();
+            if (data.success && data.type === 'text') {
+                // Display text content
+                showReceiveResult('Text content retrieved:<br><div class="mt-2 p-3 bg-dark border rounded"><pre style="white-space: pre-wrap; word-wrap: break-word;">' + escapeHtml(data.content) + '</pre></div>', 'success');
+                
+                // Clear form after successful retrieval
+                setTimeout(() => {
+                    document.getElementById('receiveForm').reset();
+                }, 2000);
+            } else {
+                showReceiveResult(data.error || 'Invalid or expired access code', 'danger');
+            }
+        } else if (response.ok) {
+            // Handle file download
+            // Get filename from Content-Disposition header if available
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filename = 'download';
+            if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                if (filenameMatch) {
+                    filename = filenameMatch[1];
+                }
+            }
+            
+            // Download the file
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            showReceiveResult('File downloaded successfully!', 'success');
+            
+            // Clear form after successful download
+            setTimeout(() => {
+                document.getElementById('receiveForm').reset();
+            }, 2000);
+        } else {
+            const data = await response.json();
+            showReceiveResult(data.error || 'Invalid or expired access code', 'danger');
+        }
+    } catch (error) {
+        showReceiveResult('An error occurred: ' + error.message, 'danger');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-download"></i> Retrieve File / Text';
+    }
+});
+
+// Receive Text form handler
+document.getElementById('receiveTextForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const code = document.getElementById('textAccessCode').value.trim().toUpperCase();
+    if (!code) {
+        showReceiveTextResult('Please enter an access code', 'danger');
+        return;
+    }
+    
+    const submitBtn = document.getElementById('receiveTextSubmitBtn');
+    const formData = new FormData(this);
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    
+    try {
+        const response = await fetch('/api/receive', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+            // Handle JSON response (text content)
+            const data = await response.json();
+            if (data.success && data.type === 'text') {
+                // Display text content in a nice format
+                showReceiveTextResult('Text content retrieved:<br><div class="mt-3 p-4 bg-dark border rounded"><pre style="white-space: pre-wrap; word-wrap: break-word; margin: 0; font-family: inherit; font-size: 1rem;">' + escapeHtml(data.content) + '</pre></div>', 'success');
+                
+                // Clear form after successful retrieval
+                setTimeout(() => {
+                    document.getElementById('receiveTextForm').reset();
+                }, 2000);
+            } else {
+                showReceiveTextResult(data.error || 'Invalid or expired access code', 'danger');
+            }
+        } else {
+            // If it's not JSON, it might be a file (shouldn't happen for text, but handle gracefully)
+            showReceiveTextResult('Unexpected response format. Please check the access code.', 'danger');
+        }
+    } catch (error) {
+        showReceiveTextResult('An error occurred: ' + error.message, 'danger');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-align-left"></i> Retrieve Text';
+    }
+});
+
+// Auto-uppercase for access code inputs
+document.addEventListener('DOMContentLoaded', function() {
+    const codeInput = document.getElementById('accessCode');
+    if (codeInput) {
+        codeInput.addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+        
+        codeInput.addEventListener('paste', function(e) {
+            setTimeout(() => {
+                this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            }, 10);
+        });
+    }
+    
+    const textCodeInput = document.getElementById('textAccessCode');
+    if (textCodeInput) {
+        textCodeInput.addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+        
+        textCodeInput.addEventListener('paste', function(e) {
+            setTimeout(() => {
+                this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            }, 10);
+        });
+    }
+});
+
+function showReceiveResult(message, type) {
+    const result = document.getElementById('receiveResult');
+    if (result) {
+        result.className = `alert alert-${type}`;
+        result.innerHTML = message;
+        result.classList.remove('d-none');
+        
+        setTimeout(() => {
+            result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+}
+
+function showCopyFeedback() {
+    const codeInput = document.getElementById('accessCodeDisplay');
+    if (codeInput) {
+        const originalValue = codeInput.value;
+        codeInput.value = 'Copied!';
+        codeInput.classList.add('text-success');
+        
+        setTimeout(() => {
+            codeInput.value = originalValue;
+            codeInput.classList.remove('text-success');
+        }, 1000);
+    }
+}
+
+function showTextCopyFeedback() {
+    const codeInput = document.getElementById('textAccessCodeDisplay');
+    if (codeInput) {
+        const originalValue = codeInput.value;
+        codeInput.value = 'Copied!';
+        codeInput.classList.add('text-success');
+        
+        setTimeout(() => {
+            codeInput.value = originalValue;
+            codeInput.classList.remove('text-success');
+        }, 1000);
+    }
+}
+
+function showReceiveTextResult(message, type) {
+    const result = document.getElementById('receiveTextResult');
+    if (result) {
+        result.className = `alert alert-${type}`;
+        result.innerHTML = message;
+        result.classList.remove('d-none');
+        
+        setTimeout(() => {
+            result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+</script>
+{% endblock %}

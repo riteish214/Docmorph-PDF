@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Compress PDF - DocMorph{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0"><i class="fas fa-compress"></i> Compress PDF File</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-secondary">Reduce PDF file size while maintaining quality.</p>
+                
+                <form id="compressForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Upload PDF File</label>
+                        <div class="drop-zone" id="dropZone">
+                            <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                            <p>Drag & drop PDF file here or click to browse</p>
+                            <input type="file" id="fileInput" name="file" accept=".pdf" class="d-none">
+                        </div>
+                    </div>
+
+                    <div class="progress mb-3 d-none" id="progressBar">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"></div>
+                    </div>
+
+                    <div id="result" class="alert d-none"></div>
+
+                    <button type="submit" class="btn btn-warning w-100" id="submitBtn">
+                        <i class="fas fa-compress"></i> Compress PDF
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('compressForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    if (!document.getElementById('fileInput').files.length) {
+        showResult('Please select a PDF file', 'danger');
+        return;
+    }
+    
+    showProgress(true);
+    document.getElementById('submitBtn').disabled = true;
+    
+    try {
+        const response = await fetch('/compress', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const reduction = data.reduction > 0 ? data.reduction : 0;
+            showResult('PDF compressed successfully! Size reduced by ' + reduction + '%. <a href="' + data.download_url + '" class="alert-link">Download here</a>', 'success');
+        } else {
+            showResult(data.error || 'An error occurred', 'danger');
+        }
+    } catch (error) {
+        showResult('An error occurred: ' + error.message, 'danger');
+    } finally {
+        showProgress(false);
+        document.getElementById('submitBtn').disabled = false;
+    }
+});
+</script>
+{% endblock %}

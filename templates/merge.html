@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Merge PDFs - DocMorph{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-object-group"></i> Merge PDF Files</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-secondary">Select multiple PDF files to combine into a single document.</p>
+                
+                <form id="mergeForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Upload PDF Files (minimum 2)</label>
+                        <div class="drop-zone" id="dropZone">
+                            <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                            <p>Drag & drop PDF files here or click to browse</p>
+                            <input type="file" id="fileInput" name="files" multiple accept=".pdf" class="d-none">
+                        </div>
+                    </div>
+
+                    <div id="fileList" class="mb-3"></div>
+
+                    <div class="progress mb-3 d-none" id="progressBar">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"></div>
+                    </div>
+
+                    <div id="result" class="alert d-none"></div>
+
+                    <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+                        <i class="fas fa-object-group"></i> Merge PDFs
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('mergeForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const fileInput = document.getElementById('fileInput');
+    const formData = new FormData();
+    
+    for (let file of fileInput.files) {
+        formData.append('files', file);
+    }
+    
+    if (fileInput.files.length < 2) {
+        showResult('Please select at least 2 PDF files', 'danger');
+        return;
+    }
+    
+    showProgress(true);
+    document.getElementById('submitBtn').disabled = true;
+    
+    try {
+        const response = await fetch('/merge', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showResult('PDFs merged successfully! <a href="' + data.download_url + '" class="alert-link">Download here</a>', 'success');
+        } else {
+            showResult(data.error || 'An error occurred', 'danger');
+        }
+    } catch (error) {
+        showResult('An error occurred: ' + error.message, 'danger');
+    } finally {
+        showProgress(false);
+        document.getElementById('submitBtn').disabled = false;
+    }
+});
+</script>
+{% endblock %}

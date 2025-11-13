@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Secure PDF - DocMorph{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0"><i class="fas fa-lock"></i> Password-Protect PDF</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-secondary">Add password protection to your PDF document.</p>
+                
+                <form id="secureForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Upload PDF File</label>
+                        <div class="drop-zone" id="dropZone">
+                            <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                            <p>Drag & drop PDF file here or click to browse</p>
+                            <input type="file" id="fileInput" name="file" accept=".pdf" class="d-none">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required placeholder="Enter a strong password">
+                        <small class="text-muted">This password will be required to open the PDF</small>
+                    </div>
+
+                    <div class="progress mb-3 d-none" id="progressBar">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"></div>
+                    </div>
+
+                    <div id="result" class="alert d-none"></div>
+
+                    <button type="submit" class="btn btn-danger w-100" id="submitBtn">
+                        <i class="fas fa-lock"></i> Secure PDF
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('secureForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    if (!document.getElementById('fileInput').files.length) {
+        showResult('Please select a PDF file', 'danger');
+        return;
+    }
+    
+    if (!document.getElementById('password').value) {
+        showResult('Please enter a password', 'danger');
+        return;
+    }
+    
+    showProgress(true);
+    document.getElementById('submitBtn').disabled = true;
+    
+    try {
+        const response = await fetch('/secure', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showResult('PDF secured successfully! Remember your password. <a href="' + data.download_url + '" class="alert-link">Download here</a>', 'success');
+        } else {
+            showResult(data.error || 'An error occurred', 'danger');
+        }
+    } catch (error) {
+        showResult('An error occurred: ' + error.message, 'danger');
+    } finally {
+        showProgress(false);
+        document.getElementById('submitBtn').disabled = false;
+    }
+});
+</script>
+{% endblock %}

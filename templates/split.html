@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Split PDF - DocMorph{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="fas fa-cut"></i> Split PDF File</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-secondary">Extract specific pages from your PDF document.</p>
+                
+                <form id="splitForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Upload PDF File</label>
+                        <div class="drop-zone" id="dropZone">
+                            <i class="fas fa-cloud-upload-alt fa-3x mb-3"></i>
+                            <p>Drag & drop PDF file here or click to browse</p>
+                            <input type="file" id="fileInput" name="file" accept=".pdf" class="d-none">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="pages" class="form-label">Page Ranges (optional)</label>
+                        <input type="text" class="form-control" id="pages" name="pages" placeholder="e.g., 1-5, 7, 10-15">
+                        <small class="text-muted">Leave empty to extract all pages. Format: 1-5, 7, 10-15</small>
+                    </div>
+
+                    <div class="progress mb-3 d-none" id="progressBar">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"></div>
+                    </div>
+
+                    <div id="result" class="alert d-none"></div>
+
+                    <button type="submit" class="btn btn-success w-100" id="submitBtn">
+                        <i class="fas fa-cut"></i> Split PDF
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('splitForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    if (!document.getElementById('fileInput').files.length) {
+        showResult('Please select a PDF file', 'danger');
+        return;
+    }
+    
+    showProgress(true);
+    document.getElementById('submitBtn').disabled = true;
+    
+    try {
+        const response = await fetch('/split', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showResult('PDF split successfully! Total pages: ' + data.total_pages + '. <a href="' + data.download_url + '" class="alert-link">Download here</a>', 'success');
+        } else {
+            showResult(data.error || 'An error occurred', 'danger');
+        }
+    } catch (error) {
+        showResult('An error occurred: ' + error.message, 'danger');
+    } finally {
+        showProgress(false);
+        document.getElementById('submitBtn').disabled = false;
+    }
+});
+</script>
+{% endblock %}
